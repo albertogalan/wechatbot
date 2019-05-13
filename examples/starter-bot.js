@@ -2,7 +2,9 @@
  * Wechaty - WeChat Bot SDK for Personal Account, Powered by TypeScript, Docker, and 💖
  *  - https://github.com/chatie/wechaty
  */
+var sleep = require('sleep')
 const { Wechaty,Friendship } = require('wechaty')
+const WAIT_REPLY=3
 
 function onScan (qrcode, status) {
   require('qrcode-terminal').generate(qrcode, { small: true })  // show qrcode on console
@@ -32,27 +34,33 @@ if (friendship.type()== friendship.Type.Receive && friendship.hello()=='hello')
     await contact.alias('bot friend ')
 }  
 
-async function if_keyword_reply(msg,keyword,reply){
-if(msg.text()==keyword){
-        const sender = msg.from()
-    if(msg.room()){
-        //sender.say('we can build the bot together')
-        //await msg.say('hey')
-        msg.room().say(reply)
-    }
-        else {
-        sender.say(reply)
+async function if_keyword_reply_private(msg,regex,reply){
+
+if(msg.text().match(regex)!==null){
+     await sleep.sleep(WAIT_REPLY) 
+    if(! msg.room()){
+        // reply message if private
+        msg.from().say(reply)
         }
  }
 }
+async function if_keyword_reply_room(msg,regex,reply){
+
+if(msg.text().match(regex)!==null){
+     await sleep.sleep(WAIT_REPLY) 
+     const sender = msg.from()
+    if(msg.room()){
+        //reply message if room
+        msg.room().say(reply)
+ }
+}
+}
 
 async function onMessage (msg) {
-  console.log(msg.toString())
-   
-  await if_keyword_reply(msg,'hello','hi how are you?')
-  await if_keyword_reply(msg,'hi','hello how are you?')
+    console.log(msg.toString())
+    await if_keyword_reply_private(msg,/^hello$/,'hi how are you?')
+    await if_keyword_reply_room(msg,/^hi$/,'hello how are you?')
     if (msg.type() === bot.Message.Type.Attachment){
-    
         console.log('message is ::' + msg.name())
         console.log('this message is an Attachment')
         var fs = require('fs');
@@ -71,12 +79,8 @@ if (await msg.mentionSelf()){
     })
 }
 
-
-
-
-
 }
-// initial wechat bot
+// Autologin 
 const bot = new Wechaty({profile:'agalan'})
 //const bot = new Wechaty()
 
