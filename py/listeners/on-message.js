@@ -1,5 +1,5 @@
 
-const PATHDIR='/data/databases/raw/lists'
+const PATHDIR='data/lists'
 
 const { Message } = require('wechaty')
 
@@ -19,7 +19,6 @@ var waitsendmsg = async function (msg,tt,textmsg) {
        index=tt.indexOf(textmsg)
     }, (tt.indexOf(textmsg)+1) * WAITMSG * 1000)
 }
-
 
 async function sendmsg (msg,textmsg){
     switch (Object.keys(textmsg)[0]) {
@@ -132,7 +131,7 @@ if(msg.text().match(regex)!==null){
 }
 async function if_keyword_record(msg,regex,file){
 
-    if (msg.text().match(regex)!==null && msg.type() === bot.Message.Type.Text)
+    if (msg.text().match(regex)!==null && msg.type() === Message.Type.Text)
 
     {
       console.log ('this message is interesting')
@@ -148,30 +147,6 @@ async function if_keyword_record(msg,regex,file){
 }
 
 
-// //Save media file, Download media file
-// async function saveMediaFile(message) {
-//   console.log(message)
-//   // const filename = message.filename
-//   const filename = 'book001.pdf'
-//   console.log('IMAGE local filename: ' + filename)
-
-//   const fileStream = fs.createWriteStream(filename)
-
-//   process.stdout.write('saving...')
-//   try {
-//     const netStream = await message.readyStream()
-//     netStream
-//       .pipe(fileStream)
-//       .on('close', _ => {
-//         const stat = fs.statSync(filename)
-//         console.log(', saved as ', filename, ' size: ', stat.size)
-//       })
-//   } catch (e) {
-//     console.error('stream error:', e)
-//   }
-// }
-
-
 //Save File / Download Media File
 
 async function saveMediaFile(msg)
@@ -181,10 +156,102 @@ async function saveMediaFile(msg)
     const file = await msg.toFileBox()
     const name = file.name
     console.log('Save file to: ' + name)
-    file.toFile('data/'+name,true)
+    file.toFile('data/files'+name,true)
   }
 }
 
+
+// async function saveContact(msg)
+// {
+    
+//  if (msg.type() !== Message.Type.Contact) {
+//     const contact = await msg.toContact()
+//     const name = file.name
+//     console.log('Save file to: ' + name)
+//     file.toFile('data/files'+name,true)
+//   }
+// }
+async function sendInformation(text){
+    var contact= await  bot.Contact.find({ alias:'alberto2'})
+    await contact.say(text)
+}
+
+
+
+async function roomInfo(msg){
+
+   const from = msg.from()
+    var text=msg.text()
+   // Room.findAll()
+    if (/^trr$/i.test(text)) {
+      const roomList = await bot.Room.findAll()
+      const topicList = await Promise.all(
+        roomList.map(async room => await room.topic()),
+      )
+
+      const totalNum = roomList.length
+      let   n        = 0
+
+      const replyText = [
+        `Total room number: ${totalNum}`,
+        ...topicList
+            .slice(0, 17)
+            .map(topic => ++n + '. ' + topic),
+      ].join('\n')
+
+      sendInformation(replyText)
+
+      return
+ }
+
+
+    // Contact.findAll()
+    if (/^trc$/i.test(text)) {
+      const contactList = await bot.Contact.findAll()
+      console.log('bot.Contact.findAll() done.')
+
+      const totalNum = contactList.length
+      let n = 0
+
+      const replyText = [
+        `Total contact number: ${totalNum}`,
+        contactList
+          .slice(0, 17)
+          .map(contact => contact.name())
+          .map(name => ++n + '. ' + name),
+      ].join('\n')
+  
+      sendInformation(replyText)
+
+      return
+    }
+
+   // Contact.findAll()
+    if (/^tra$/i.test(text)) {
+      const room= await msg.room()
+      const memberList = await room.memberAll()
+      const memberName = await Promise.all(
+        memberList.map(async member => await member.name()),
+      )
+
+      const totalNum = memberList.length
+      let   n        = 0
+
+      const replyText = [
+        `Total room number: ${totalNum}`,
+        ...memberName
+            .slice(0, 17)
+            .map(topic => ++n + '. ' + topic),
+      ].join('\n')
+
+      sendInformation(replyText)
+
+      return
+ }
+
+
+
+}
 
 // Process Messages
 async function onMessage (msg) {
@@ -192,7 +259,7 @@ async function onMessage (msg) {
     var saludation=/^(hello|hi)$/i
     reply=[
         {'text':'Hi how are you?'},
-        {'text':'Long time no see you',},
+        {'text':'Long time no see you'},
         {'text':'Do you like wine?'},
         {'text':'I have some Spanish wine, here in Shanghai'}
     ]
@@ -221,22 +288,18 @@ async function onMessage (msg) {
 
     // ]
 
-
-
     await if_keyword_record(msg,/http[s]?:\/\/.*?</,PATHDIR + '/bot-url.md')
     await if_keyword_record(msg,/cybersecur/i,PATHDIR + '/bot-url.md')
     await if_keyword_record(msg,/machine learn/i,PATHDIR + '/bot-url.md')
     await if_command_do(msg) 
-
     await saveMediaFile(msg)
-
+    await roomInfo(msg)
 
 // record messages to me
 if (await msg.mentionSelf()){
     console.log ('this message mention me')
         const text = msg.text()
-    const date = Date.now()
-
+        const date = Date.now()
         const room = msg.room()
         const contact =await msg.from()
     fs.appendFile(PATHDIR +'/bot-mention.csv',`${room}, ${contact},${text},${date}\n`,(err) =>{

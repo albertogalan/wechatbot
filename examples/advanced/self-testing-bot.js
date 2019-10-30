@@ -27,10 +27,12 @@ const {
   log,
 }               = require('wechaty')
 
-const BOT_QR_CODE_IMAGE_FILE = path.resolve(
-  __dirname,
-  '../docs/images/bot-qr-code.png',
-)
+   // fileBox = FileBox.fromFile('')
+const BOT_QR_CODE_IMAGE_FILE = path.resolve('/data/src/tornae/anteater/scraper/specific/wechaty/mpv.jpg.png')
+// path.resolve(
+//   __dirname,
+//   '../docs/images/bot-qr-code.png',
+// )
 
 const bot = Wechaty.instance()
 
@@ -67,33 +69,42 @@ bot
   bot.say('Wechaty login').catch(console.error)
 })
 .on('scan', (qrcode, status) => {
-  generate(qrcode, { small: true })
-  console.log(`${qrcode}\n[${status}] Scan QR Code in above url to login: `)
+//   generate(qrcode, { small: true })
+//   console.log(`${qrcode}\n[${status}] Scan QR Code in above url to login: `)
+  require('qrcode-terminal').generate(qrcode, { small: true })  // show qrcode on console
+  const qrcodeImageUrl = [
+    'https://api.qrserver.com/v1/create-qr-code/?data=',
+    encodeURIComponent(qrcode),
+  ].join('')
+  console.log(qrcodeImageUrl)
 })
+
+
+
 .on('message', async msg => {
   const from = msg.from()
 
-  if (!from) {
-    log.info('Bot', 'on(message) skip no-from() message: %s', msg)
-    return
-  }
+  // if (!from) {
+  //   log.info('Bot', 'on(message) skip no-from() message: %s', msg)
+  //   return
+  // }
 
   if (msg.type() !== bot.Message.Type.Text) {
     log.info('Bot', 'on(message) skip non-text message: %s', msg)
     return
   }
 
-  if (msg.age() > 60) {
-    log.info('Bot', 'on(message) skip message older(%d) than 60 seconds: %s', msg.age(), msg)
-    return
-  }
+  // if (msg.age() > 600) {
+  //   log.info('Bot', 'on(message) skip message older(%d) than 60 seconds: %s', msg.age(), msg)
+  //   return
+  // }
 
   try {
     console.log(msg.toString()) // on(message) exception: Error: no file
     const text = msg.text()
 
     // Room.findAll()
-    if (/^testRoom$/i.test(text)) {
+    if (/^tornae/i.test(text)) {
       const roomList = await bot.Room.findAll()
       const topicList = await Promise.all(
         roomList.map(async room => await room.topic()),
@@ -189,23 +200,25 @@ bot
       log.info('Bot', 'REPLY: dong')
       await msg.say('dong')
 
-      const joinWechaty =  `Join Wechaty Developers' Community\n\n` +
-                            `Wechaty is used in many ChatBot projects by hundreds of developers.\n\n` +
-                            `If you want to talk with other developers, just scan the following QR Code in WeChat with secret code: wechaty,\n\n` +
-                            `you can join our Wechaty Developers' Home at once`
-      await msg.say(joinWechaty)
+      // const joinWechaty =  `Join Wechaty Developers' Community\n\n` +
+      //                       `Wechaty is used in many ChatBot projects by hundreds of developers.\n\n` +
+      //                       `If you want to talk with other developers, just scan the following QR Code in WeChat with secret code: wechaty,\n\n` +
+      //                       `you can join our Wechaty Developers' Home at once`
+      // await msg.say(joinWechaty)
+      // await msg.to().say(joinWechaty)
 
       /**
        * 2. reply qrcode image
        */
-      const fileBox = FileBox.fromFile(BOT_QR_CODE_IMAGE_FILE)
+      const fileBox = FileBox.fromFile('./mpv.pdf')
       // const fileBox = FileBox.packStream(
       //   fs.createReadStream(BOT_QR_CODE_IMAGE_FILE),
       //   BOT_QR_CODE_IMAGE_FILE,
       // )
 
-      log.info('Bot', 'REPLY: %s', fileBox)
-      await msg.say(fileBox)
+      log.info('Bot', 'REPLY  IMAAAAAAAAAGE: %s', fileBox)
+      // await msg.say(fileBox)
+      await msg.to().say(fileBox)
 
       /**
        * 3. reply 'scan now!'

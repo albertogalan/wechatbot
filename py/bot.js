@@ -83,19 +83,19 @@ async function onRoomjoin (room,inviteeList, inviter){
   {
       const welcomemsg=[
         `Welcome to ${topic} \n`,
-        '-----------------------\n',
+        '----------------------------------------\n',
         'We are a buyer group of imported wine\n',
         `Here you can access B2B prices\n`,
-        `Mininum quantity to buy is 1box (6 bottles)\n`,
+        `Mininum quantity 1 box(6bottles)\n`,
         `1st Pay to Alberto\n`,
         `2nd Add to the list\n`,
         `3rd We buy the wine When we reach 10 boxes\n`,
-        `Free Delivery to 上海上海市徐汇区田林街道田林九村九号楼五楼501 (near 桂林路地铁站)\n`,
+        `Delivery to 上海上海市徐汇区田林街道田林九村九号楼五楼501 (near 桂林路地铁站)\n`,
         `To send the wine to other place ask Alberto\n`
       ].join('')
       await room.say(welcomemsg, inviteeList[0])
-      const fileBox = FileBox.fromUrl('https://chatie.io/wechaty/images/bot-qr-code.png')
-      await room.say(fileBox)
+      // const fileBox = FileBox.fromUrl('https://chatie.io/wechaty/images/bot-qr-code.png')
+      // await room.say(fileBox)
   }
 }
 // Somebody join the Room
@@ -118,7 +118,7 @@ async function onRoomjoin (room,inviteeList, inviter){
 // }
 
 // Autologin 
-let bot = new Wechaty({profile:'agalan2'})
+global.bot = new Wechaty({profile:'agalan2'})
 
 bot.on('message', onMessage)
 bot.on('scan',    onScan)
@@ -138,14 +138,33 @@ console.log('Starter Bot Started.')
 
 async function main(){
    console.log('main ..')
-
    var contact= await  bot.Contact.find({ alias:'alberto2'})
-   const fileBox = FileBox.fromUrl('http://www.grandtop.cn/data/images/case/20190506173930_935.png')
    await contact.say('Hey how r you')
+   // console.log(contact)
+   
+   // find a contact
+   // var contact2= await  bot.Contact.findAll({ alias:'王'})
+   // console.log(contact2)
+   // await Friendship.add(contact.id,"hello")
 
-   await bot.say('hello    hey')
-   fileBox = FileBox.fromFile('/data/src/tornae/anteater/scraper/specific/wechaty/mpv.jpg')
-   await contact.say(fileBox)
+   //doesn't work
+   // var fileBox = FileBox.fromUrl('http://www.grandtop.cn/data/images/case/20190506173930_935.png')
+   // fileBox = FileBox.fromFile('/data/src/tornae/anteater/scraper/specific/wechaty/mpv.jpg')
+   // await contact.say(fileBox)
       // const fileBox = FileBox.fromFile('/tmp/text.txt') 
    // await contact.say(fileBox)
+   // findContact(bot,"alberto2")
+
+
+
+}
+
+
+async function findContact(bot,alias){
+    console.log("adding a friendship")
+    contact= await bot.Contact.find("alberto2")
+    if (contact !== null)
+    {
+     console.log("the contact is:" +contact)
+    }
 }
