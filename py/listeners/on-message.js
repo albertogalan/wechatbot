@@ -12,8 +12,6 @@ const TESUSER='alberto2'
 const WAIT_REPLY=1
 const WAITMSG=1
 
-
-
 var waitsendmsg = async function (msg,tt,textmsg) {
     setTimeout(function () {
        // cb(null, tt)

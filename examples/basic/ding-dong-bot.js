@@ -109,10 +109,10 @@ function onError (e) {
 async function onMessage (msg) {
   console.log(msg.toString())
 
-  if (msg.age() > 60) {
-    console.log('Message discarded because its TOO OLD(than 1 minute)')
-    return
-  }
+  // if (msg.age() > 600) {
+  //   console.log('Message discarded because its TOO OLD(than 1 minute)')
+  //   return
+  // }
 
   if (   msg.type() !== bot.Message.Type.Text
       || !/^(ding|ping|bing|code)$/i.test(msg.text())
