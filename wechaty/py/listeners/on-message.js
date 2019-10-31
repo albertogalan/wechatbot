@@ -156,7 +156,7 @@ async function saveMediaFile(msg)
     const file = await msg.toFileBox()
     const name = file.name
     console.log('Save file to: ' + name)
-    file.toFile('data/files'+name,true)
+    file.toFile('data/files/'+name,true)
   }
 }
 

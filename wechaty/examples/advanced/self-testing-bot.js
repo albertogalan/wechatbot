@@ -104,7 +104,7 @@ bot
     const text = msg.text()
 
     // Room.findAll()
-    if (/^tornae/i.test(text)) {
+    if (/^testRoom$/i.test(text)) {
       const roomList = await bot.Room.findAll()
       const topicList = await Promise.all(
         roomList.map(async room => await room.topic()),

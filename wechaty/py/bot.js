@@ -12,6 +12,11 @@ const WAITADDCONTACT=5
 const { FileBox }  = require('file-box')
 const path  = require('path')
 const onMessage = require('./listeners/on-message')
+const onFriendShip = require('./listeners/on-friend')
+
+
+
+
 
 function onScan (qrcode, status) {
   require('qrcode-terminal').generate(qrcode, { small: true })  // show qrcode on console
@@ -33,26 +38,7 @@ function onLogout(user) {
   console.log(`${user} logout`)
 }
 
-// add friendship
-async function onFriendship (friendship){
-console.log('receive a friend request')
-    switch (friendship.type()) {
-        case Friendship.Type.Receive:
-          await friendship.accept()
-          contact.say('你好, 很高兴认识你 ')
-          contact.say('很高兴认识你 ')
-          // contact.say('hello, nice to meet you ')
-          await contact.alias('bot-'+ contact.name())
-        break;
 
-        case Friendship.Type.Confirm:
-          contact.say('你好, 很高兴认识你 ')
-          contact.say('很高兴认识你 ')
-          // contact.say('hello, nice to meet you ')
-          await contact.alias('bot-'+ contact.name())
-        default:
-    }
-    }  
 
 // Accept room invitation
 async function onRoominvite(roomInvitation){
@@ -89,7 +75,7 @@ async function onRoomjoin (room,inviteeList, inviter){
         `Mininum quantity 1 box(6bottles)\n`,
         `1st Pay to Alberto\n`,
         `2nd Add to the list\n`,
-        `3rd We buy the wine When we reach 10 boxes\n`,
+        `3rd We buy the wine when we reach 10 boxes\n`,
         `Delivery to 上海上海市徐汇区田林街道田林九村九号楼五楼501 (near 桂林路地铁站)\n`,
         `To send the wine to other place ask Alberto\n`
       ].join('')
@@ -124,7 +110,7 @@ bot.on('message', onMessage)
 bot.on('scan',    onScan)
 bot.on('login',   onLogin)
 bot.on('logout',  onLogout)
-bot.on('friendship',onFriendship)
+bot.on('friendship',onFriendShip)
 bot.on('room-invite',onRoominvite)
 bot.on('room-join', onRoomjoin)
 
@@ -140,6 +126,8 @@ async function main(){
    console.log('main ..')
    var contact= await  bot.Contact.find({ alias:'alberto2'})
    await contact.say('Hey how r you')
+   fileBox = FileBox.fromFile('book001.jpg')
+   await contact.say(fileBox)
    // console.log(contact)
    
    // find a contact
@@ -149,8 +137,7 @@ async function main(){
 
    //doesn't work
    // var fileBox = FileBox.fromUrl('http://www.grandtop.cn/data/images/case/20190506173930_935.png')
-   // fileBox = FileBox.fromFile('/data/src/tornae/anteater/scraper/specific/wechaty/mpv.jpg')
-   // await contact.say(fileBox)
+   
       // const fileBox = FileBox.fromFile('/tmp/text.txt') 
    // await contact.say(fileBox)
    // findContact(bot,"alberto2")
